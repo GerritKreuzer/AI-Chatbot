@@ -1,9 +1,8 @@
 package OpenAiAPI;
 
+import Server.Server;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class OpenAiAPIHandlerTest {
 
@@ -19,7 +18,7 @@ class OpenAiAPIHandlerTest {
     @Test
     void getOpenAiApiJsonInput(){
         String userInput = "Hallo, das ist ein \"Test\",\n mit speziellen Zeichen. \\\\\\\'\\";
-        String json = OpenAiAPIHandler.getOpenAiApiJsonInput(OpenAiAPIHandler.model, userInput, OpenAiAPIHandler.systemMessage, OpenAiAPIHandler.temperature);
+        String json = OpenAiAPIHandler.getOpenAiApiJsonInput(OpenAiAPIHandler.defaultModel, userInput, OpenAiAPIHandler.defaultSystemMessage, OpenAiAPIHandler.temperature);
         System.out.println(json);
         assert isValidJson(json);
         assert !isValidJson("reuihgiuüdrhbfgrdpiuzgbdizu");
@@ -27,10 +26,9 @@ class OpenAiAPIHandlerTest {
 
     @Test
     void getOpenAiApiResponse() {
-        new OpenAiAPIHandler();
+        OpenAiAPIHandler.readApiKey("C:\\Users\\Gerrit\\Documents\\API_KEY.txt");
         String userInput = "Reply \"This is a test\"";
-        String systemMessage = OpenAiAPIHandler.systemMessage;
-        String response = OpenAiAPIHandler.getOpenAiApiResponse(systemMessage, userInput);
+        String response = OpenAiAPIHandler.getOpenAiApiResponse(OpenAiAPIHandler.defaultSystemMessage, userInput);
         System.out.println(response);
         assert response != null;
         assert isValidJson(response);

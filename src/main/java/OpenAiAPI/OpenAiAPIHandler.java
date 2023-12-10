@@ -15,19 +15,15 @@ import java.nio.file.Paths;
 
 public class OpenAiAPIHandler {
     private static String apiKey;
-    private static final String apiKeyPath = "C:\\Users\\Gerrit\\Documents\\API_KEY.txt";
-    public static final String model = "gpt-3.5-turbo";
-    public static final String systemMessage = "You are an informative assistant.";
+    public static final String defaultModel = "gpt-3.5-turbo";
+    public static final String defaultSystemMessage = "You are an informative assistant.";
     public static final double temperature = 0.5;
 
-    public OpenAiAPIHandler(){
-        readApiKey(apiKeyPath);
-    }
-
-    static void readApiKey(String path) {
+    public static void readApiKey(String path) {
         try {
             Path filePath = Paths.get(path);
             apiKey = new String(Files.readAllBytes(filePath)).trim();
+            System.out.println(apiKey);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -87,7 +83,7 @@ public class OpenAiAPIHandler {
             connection.setDoOutput(true);
 
             // Create JSON payload
-            String jsonInputString = getOpenAiApiJsonInput(model, userInput, systemMessage, temperature);
+            String jsonInputString = getOpenAiApiJsonInput(defaultModel, userInput, systemMessage, temperature);
 
             // Write JSON payload to the connection's output stream
             try (OutputStream os = connection.getOutputStream()) {
