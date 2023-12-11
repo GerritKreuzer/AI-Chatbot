@@ -75,6 +75,7 @@
         </div>
     </div>
     <script>
+        let currentUrl = window.location.href;
         let accessKey = "";
         let waiting = false;
         document.getElementById('message-input').addEventListener('keypress', function (e) {
@@ -93,9 +94,8 @@
             messageInput.value = '';
         }
         function checkAccessKey(){
-            console.log("checking key");
             accessKey = document.getElementById("access-key-input").value;
-            fetch('http://localhost:80/verify-access-key', {
+            fetch(currentUrl + 'verify-access-key', {
                 method: 'POST',
                 headers: {
                     'Authorization': accessKey
@@ -111,7 +111,7 @@
             .catch(error => console.error(error))
         }
         function sendPromptToServer(prompt) {
-            fetch('http://localhost:80', {
+            fetch(currentUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
