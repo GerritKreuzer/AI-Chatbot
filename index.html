@@ -65,7 +65,7 @@
     <div id="access-key-prompt">
         <label for="access-key-input">Enter Access Key:</label>
         <input type="text" id="access-key-input">
-        <button onclick="addAccessKey()">Submit</button>
+        <button onclick="checkAccessKey()">Login</button>
     </div>
     <div id="chat-container">
         <div id="chat-messages"></div>
@@ -75,18 +75,13 @@
         </div>
     </div>
     <script>
-        var accessKey = "";
+        let accessKey = "";
         let waiting = false;
         document.getElementById('message-input').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 sendMessage();
             }
         });
-        function addAccessKey(){
-            accessKey = document.getElementById("access-key-input").value;
-            document.getElementById("access-key-prompt").style.display = "none";
-            document.getElementById("chat-container").style.display = "block";
-        }
         function sendMessage() {
             if(waiting) return;
             const messageInput = document.getElementById('message-input');
@@ -96,6 +91,24 @@
             displayMessage('user', message);
             sendPromptToServer(message);
             messageInput.value = '';
+        }
+        function checkAccessKey(){
+            console.log("checking key");
+            accessKey = document.getElementById("access-key-input").value;
+            fetch('http://localhost:80/verify-access-key', {
+                method: 'POST',
+                headers: {
+                    'Authorization': accessKey
+                }
+            }).then(response => {
+                if(response.ok){
+                    document.getElementById("access-key-prompt").style.display = "none";
+                    document.getElementById("chat-container").style.display = "block";
+                }else{
+                    alert("Error: Unknown Key");
+                }
+            })
+            .catch(error => console.error(error))
         }
         function sendPromptToServer(prompt) {
             fetch('http://localhost:80', {
@@ -108,15 +121,11 @@
             })
             .then(data => data.text())
             .then(text => {
-                console.log(text);
                 let serverReply = text || 'Error: No response from the server.';
                 displayMessage('server', serverReply.replaceAll('\\n', '\n'));
-                waiting = false;
             })
-            .catch(error => {
-                waiting = false;
-                console.error(error);
-            });
+            .catch(error => console.error(error))
+            .finally(() => waiting = false);
         }
         function displayMessage(sender, text) {
             let chatMessages = document.getElementById('chat-messages');

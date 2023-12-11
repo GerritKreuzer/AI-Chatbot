@@ -33,7 +33,11 @@ public class MyHttpHandler implements HttpHandler {
         if ("GET".equals(exchange.getRequestMethod())) {
             handleGetRequest(exchange);
         } else if ("POST".equals(exchange.getRequestMethod())) {
-            handlePostRequest(exchange);
+            if ("/verify-access-key".equals(exchange.getRequestURI().getPath())) {
+                handleAccessKeyVerification(exchange);
+            }else{
+                handlePostRequest(exchange);
+            }
         }
     }
 
@@ -44,8 +48,17 @@ public class MyHttpHandler implements HttpHandler {
 
         // Send the HTML content as the response
         try (OutputStream os = exchange.getResponseBody()) {
-            os.write(Server.fileBytes);
+            os.write(Server.getFileBytes());
         }
+    }
+
+    private void handleAccessKeyVerification(HttpExchange exchange) throws IOException {
+        if (allowAccess(exchange)) {
+            exchange.sendResponseHeaders(200, 0);
+        } else {
+            exchange.sendResponseHeaders(401, 0);
+        }
+        exchange.close();
     }
 
     private void handlePostRequest(HttpExchange exchange) throws IOException {
