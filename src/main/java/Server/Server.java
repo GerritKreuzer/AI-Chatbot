@@ -26,7 +26,7 @@ public class Server {
     }
 
     private static void getPaths() throws IOException {
-        List<String> paths = Files.readAllLines(Paths.get("src/main/resources/paths.txt"));
+        List<String> paths = Files.readAllLines(Paths.get("paths.txt"));
         apiKeyPath = paths.get(0);
         accessKeysPath = paths.get(1);
     }

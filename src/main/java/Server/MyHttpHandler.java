@@ -25,7 +25,7 @@ public class MyHttpHandler implements HttpHandler {
             accessKeys.addAll(lines);
             System.out.println("read access Keys");
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(e);
         }
     }
 

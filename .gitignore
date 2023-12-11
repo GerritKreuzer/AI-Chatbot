@@ -4,3 +4,4 @@ target/
 *.iws
 *.ipr
 API_KEY.txt
+paths.txt

@@ -32,6 +32,7 @@ public class OpenAiAPIHandler {
 
     public static String getOpenAiApiJsonInput(String model, String userInput, String systemMessage, double temperature) {
         try {
+            System.out.println("creating json api input");
             // Create JSON object
             JSONObject jsonInput = new JSONObject();
             jsonInput.put("model", model);
@@ -66,6 +67,7 @@ public class OpenAiAPIHandler {
     }
 
     public static String getOpenAiApiResponse(String systemMessage, String userInput) {
+        System.out.println("in getOpenApiResponse");
         try {
             URL url = new URL("https://api.openai.com/v1/chat/completions");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
