@@ -1,5 +1,6 @@
 .idea/
+target/
 *.iml
 *.iws
 *.ipr
-out/
+API_KEY.txt
