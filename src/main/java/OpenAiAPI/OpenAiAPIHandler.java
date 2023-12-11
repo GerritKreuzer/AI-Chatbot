@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,8 +24,9 @@ public class OpenAiAPIHandler {
         try {
             Path filePath = Paths.get(path);
             apiKey = new String(Files.readAllBytes(filePath)).trim();
+            System.out.println("read api key " + apiKey);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(e);
         }
     }
 
@@ -58,7 +60,7 @@ public class OpenAiAPIHandler {
             return jsonInput.toString();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e);
             return null;
         }
     }
@@ -75,25 +77,28 @@ public class OpenAiAPIHandler {
             // Create JSON payload
             String jsonInputString = getOpenAiApiJsonInput(defaultModel, userInput, systemMessage, temperature);
 
+            System.out.println("ApiInput " + jsonInputString);
             // Write JSON payload to the connection's output stream
             try (OutputStream os = connection.getOutputStream()) {
+                System.out.println("sending to api");
                 assert jsonInputString != null;
-                byte[] input = jsonInputString.getBytes("utf-8");
+                byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                 os.write(input, 0, input.length);
             }
 
             // Get the response
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf-8"))) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
                 StringBuilder response = new StringBuilder();
                 String responseLine;
                 while ((responseLine = br.readLine()) != null) {
                     response.append(responseLine.trim());
                 }
+                System.out.println("ApiResponse " + response);
                 return response.toString();
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(e);
             return null;
         }
     }

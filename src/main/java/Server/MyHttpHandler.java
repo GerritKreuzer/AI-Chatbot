@@ -23,6 +23,7 @@ public class MyHttpHandler implements HttpHandler {
             Path filePath = Paths.get(path);
             List<String> lines = Files.readAllLines(filePath);
             accessKeys.addAll(lines);
+            System.out.println("read access Keys");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -30,6 +31,7 @@ public class MyHttpHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
+        System.out.println("received " + exchange.getRequestMethod());
         if ("GET".equals(exchange.getRequestMethod())) {
             handleGetRequest(exchange);
         } else if ("POST".equals(exchange.getRequestMethod())) {
@@ -53,6 +55,7 @@ public class MyHttpHandler implements HttpHandler {
     }
 
     private void handleAccessKeyVerification(HttpExchange exchange) throws IOException {
+        System.out.println("Verifying accessKey");
         if (allowAccess(exchange)) {
             exchange.sendResponseHeaders(200, 0);
         } else {
@@ -69,14 +72,16 @@ public class MyHttpHandler implements HttpHandler {
         }
         // Get the request body
         String requestBody = new String(exchange.getRequestBody().readAllBytes());
+        System.out.println("Requestbody: " + requestBody);
         String openAiApiResponse = OpenAiAPIHandler.getOpenAiApiResponse(OpenAiAPIHandler.defaultSystemMessage, requestBody);
-        assert openAiApiResponse != null;
         String chatResponse = parseResponse(openAiApiResponse);
+        System.out.println("ChatResponse " + chatResponse);
         exchange.getResponseHeaders().set("Content-Type", "application/json");
         exchange.sendResponseHeaders(200, chatResponse.length());
 
         // Send the OpenAI API response as the response
         try (OutputStream os = exchange.getResponseBody()) {
+            System.out.println("sending back chatresponse");
             os.write(chatResponse.getBytes());
         }
     }

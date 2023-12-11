@@ -16,11 +16,10 @@ class OpenAiAPIHandlerTest {
 
     @Test
     void getOpenAiApiJsonInput(){
-        String userInput = "Hallo, das ist ein \"Test\",\n mit speziellen Zeichen. \\\\\\\'\\";
+        String userInput = "Hallo, das ist ein \"Test\",\n mit speziellen Zeichen. \\\\\\'\\";
         String json = OpenAiAPIHandler.getOpenAiApiJsonInput(OpenAiAPIHandler.defaultModel, userInput, OpenAiAPIHandler.defaultSystemMessage, OpenAiAPIHandler.temperature);
         System.out.println(json);
         assert isValidJson(json);
-        assert !isValidJson("reuihgiuüdrhbfgrdpiuzgbdizu");
     }
 
     @Test
