@@ -18,7 +18,11 @@
         p {
             white-space: pre-line;
         }
+        label{
+            color: white;
+        }
         #chat-container {
+            display: none;
             border: 1px solid #ccc;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 900px;
@@ -58,6 +62,11 @@
     </style>
 </head>
 <body>
+    <div id="access-key-prompt">
+        <label for="access-key-input">Enter Access Key:</label>
+        <input type="text" id="access-key-input">
+        <button onclick="addAccessKey()">Submit</button>
+    </div>
     <div id="chat-container">
         <div id="chat-messages"></div>
         <div id="user-input">
@@ -66,16 +75,22 @@
         </div>
     </div>
     <script>
-        var waiting = false;
+        var accessKey = "";
+        let waiting = false;
         document.getElementById('message-input').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 sendMessage();
             }
         });
+        function addAccessKey(){
+            accessKey = document.getElementById("access-key-input").value;
+            document.getElementById("access-key-prompt").style.display = "none";
+            document.getElementById("chat-container").style.display = "block";
+        }
         function sendMessage() {
             if(waiting) return;
-            var messageInput = document.getElementById('message-input');
-            var message = messageInput.value;
+            const messageInput = document.getElementById('message-input');
+            const message = messageInput.value;
             if (message.trim() === '') return;
             waiting = true;
             displayMessage('user', message);
@@ -87,19 +102,20 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': accessKey
                 },
                 body: prompt,
             })
             .then(data => data.text())
-                .then(text => {
-                    console.log(text);
-                    let serverReply = text || 'Error: No response from the server.';
-                    displayMessage('server', serverReply.replaceAll('\\n', '\n'));
-                    waiting = false;
-                })
-            .catch(error => {
-                console.error('Error:', error);
+            .then(text => {
+                console.log(text);
+                let serverReply = text || 'Error: No response from the server.';
+                displayMessage('server', serverReply.replaceAll('\\n', '\n'));
                 waiting = false;
+            })
+            .catch(error => {
+                waiting = false;
+                console.error(error);
             });
         }
         function displayMessage(sender, text) {
