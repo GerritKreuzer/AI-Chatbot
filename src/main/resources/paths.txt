@@ -1,0 +1,2 @@
+C:\Users\Gerrit\Documents\API_KEY.txt
+C:\Users\Gerrit\Documents\CHATBOT_ACCESS_KEYS.txt
