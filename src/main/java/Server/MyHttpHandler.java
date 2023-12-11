@@ -3,6 +3,7 @@ package Server;
 import OpenAiAPI.OpenAiAPIHandler;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -11,12 +12,10 @@ public class MyHttpHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        System.out.println("Handling: " + exchange.getRequestMethod() + " Request");
         if ("GET".equals(exchange.getRequestMethod())) {
             handleGetRequest(exchange);
         } else if ("POST".equals(exchange.getRequestMethod())) {
-            //handlePostRequest(exchange);
-            thisMethodIsJustForTesting(exchange);
+            handlePostRequest(exchange);
         }
     }
 
@@ -31,37 +30,24 @@ public class MyHttpHandler implements HttpHandler {
         }
     }
 
-    private void thisMethodIsJustForTesting(HttpExchange exchange) throws IOException {
-        // Get the request body
-        String requestBody = new String(exchange.getRequestBody().readAllBytes());
-        System.out.println("Requestbody: " + requestBody);
-
-        String openAiApiResponse = "This is just a test";
-
-        exchange.getResponseHeaders().set("Content-Type", "application/json");
-        exchange.sendResponseHeaders(200, openAiApiResponse.length());
-
-        // Send the OpenAI API response as the response
-        try (OutputStream os = exchange.getResponseBody()) {
-            os.write(openAiApiResponse.getBytes());
-        }
-    }
-
     private void handlePostRequest(HttpExchange exchange) throws IOException {
         // Get the request body
         String requestBody = new String(exchange.getRequestBody().readAllBytes());
-        System.out.println("Requestbody: " + requestBody);
-
         String openAiApiResponse = OpenAiAPIHandler.getOpenAiApiResponse(OpenAiAPIHandler.defaultSystemMessage, requestBody);
         assert openAiApiResponse != null;
-        System.out.println("APIresponse: " + openAiApiResponse);
-
+        String chatResponse = parseResponse(openAiApiResponse);
         exchange.getResponseHeaders().set("Content-Type", "application/json");
-        exchange.sendResponseHeaders(200, openAiApiResponse.length());
+        exchange.sendResponseHeaders(200, chatResponse.length());
 
         // Send the OpenAI API response as the response
         try (OutputStream os = exchange.getResponseBody()) {
-            os.write(openAiApiResponse.getBytes());
+            os.write(chatResponse.getBytes());
         }
+    }
+
+    private static String parseResponse(String response) {
+        JSONObject jsonObject = new JSONObject(response);
+        JSONObject message = jsonObject.getJSONArray("choices").getJSONObject(0).getJSONObject("message");
+        return message.getString("content");
     }
 }

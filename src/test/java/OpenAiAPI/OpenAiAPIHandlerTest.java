@@ -1,6 +1,5 @@
 package OpenAiAPI;
 
-import Server.Server;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 

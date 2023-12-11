@@ -15,6 +15,9 @@
             height: 100vh;
             background-color: darkslategrey;
         }
+        p {
+            white-space: pre-line;
+        }
         #chat-container {
             border: 1px solid #ccc;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -27,20 +30,19 @@
             overflow-y: scroll;
             padding: 10px;
         }
-        .message {
+        .messageContainer {
             margin-bottom: 10px;
         }
-        .messageSpan {
-            word-wrap: break-word;
-            padding: 4px;
+        .message {
+            width: fit-content;
+            padding: 5px;
             background-color: aquamarine;
             border-radius: 5px;
         }
-        .user .messageSpan {
+        .user .message {
             background-color: lightskyblue;
-        }
-        .user {
-            text-align: right;
+            margin-left: auto;
+            margin-right: 0;
         }
         #user-input {
             display: flex;
@@ -75,12 +77,9 @@
             var messageInput = document.getElementById('message-input');
             var message = messageInput.value;
             if (message.trim() === '') return;
-            // Display user message
             waiting = true;
             displayMessage('user', message);
-            // Send user message to server
             sendPromptToServer(message);
-            // Clear input field
             messageInput.value = '';
         }
         function sendPromptToServer(prompt) {
@@ -89,30 +88,29 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ prompt }),
+                body: prompt,
             })
-            .then(data => {
-                // Display server response
-                console.log(data);
-                let serverReply = data || 'Error: No response from the server.';
-                displayMessage('server', serverReply);
-                waiting = false;
-            })
+            .then(data => data.text())
+                .then(text => {
+                    console.log(text);
+                    let serverReply = text || 'Error: No response from the server.';
+                    displayMessage('server', serverReply.replaceAll('\\n', '\n'));
+                    waiting = false;
+                })
             .catch(error => {
                 console.error('Error:', error);
                 waiting = false;
             });
         }
         function displayMessage(sender, text) {
-            var chatMessages = document.getElementById('chat-messages');
-            var messageElement = document.createElement('div');
-            var messageSpan = document.createElement("span");
-            messageSpan.textContent = text;
-            messageSpan.classList.add("messageSpan");
-            messageElement.classList.add('message', sender);
-            messageElement.appendChild(messageSpan);
-            chatMessages.appendChild(messageElement);
-            // Scroll to the bottom to show the latest message
+            let chatMessages = document.getElementById('chat-messages');
+            let messageContainer = document.createElement('div');
+            let message = document.createElement("p");
+            message.textContent = text;
+            message.classList.add("message");
+            messageContainer.classList.add('messageContainer', sender);
+            messageContainer.appendChild(message);
+            chatMessages.appendChild(messageContainer);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
     </script>

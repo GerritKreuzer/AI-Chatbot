@@ -23,7 +23,6 @@ public class OpenAiAPIHandler {
         try {
             Path filePath = Paths.get(path);
             apiKey = new String(Files.readAllBytes(filePath)).trim();
-            System.out.println(apiKey);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -66,20 +65,11 @@ public class OpenAiAPIHandler {
 
     public static String getOpenAiApiResponse(String systemMessage, String userInput) {
         try {
-            // OpenAI API endpoint
             URL url = new URL("https://api.openai.com/v1/chat/completions");
-
-            // Create connection
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-            // Set the request method to POST
             connection.setRequestMethod("POST");
-
-            // Set request headers
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Authorization", "Bearer " + apiKey);
-
-            // Enable input/output streams
             connection.setDoOutput(true);
 
             // Create JSON payload
